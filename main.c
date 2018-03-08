@@ -1,19 +1,29 @@
-#include "pic_configuration.h"
 #include "RTOS.h"
-#define     DONE    {while(1){}}
+#define     MAXSTACKSIZE    31
+#define     EXEC_DONE    {while(1){}}
 
 #define  simple_delay(){for(unsigned char i=0;i<255;i++){}}
+
+
+StackStruct    Task0Stack[MAXSTACKSIZE];
+StackStruct    Task1Stack[MAXSTACKSIZE];
+thread task0;
+thread task1;
 
 void task_0();
 void task_1();
 
 void main(void) {
     setup_rtos();
-    task0.function = task_0;
-    task1.function = task_1;
     
-    init_tasks();
-    DONE;
+    Task_init(&task0,task_0,Task0Stack,MAXSTACKSIZE);
+    Task_init(&task1,task_1,Task1Stack,MAXSTACKSIZE);
+    
+    Task_register(&task0);
+    Task_register(&task1);
+
+    Scheduler();
+    EXEC_DONE;
 }
 
 void task_0(){

@@ -1,40 +1,47 @@
 #ifndef RTOS_H
 #define RTOS_H
-    #include <xc.h>
-    #include <pic18f4550.h>
+    #include "pic_configuration.h"
+    #define MAX_THREAD          4
+    #define DefaultTimerData    35000
+
+    #define READY               0b00000001
+    #define BLOCKED             0b00000010
+    #define RUNNING             0b00000100
+    #define DONE                0b00001000
 
     void interrupt HISR();
     void interrupt low_priority LISR();
     
-    volatile unsigned char task_counter = 0;
-    volatile unsigned char       myBSR;
-    volatile unsigned char       myWREG;
-    volatile unsigned char       mySTATUS;
-    volatile unsigned short long myPC;
-    
     
     typedef struct{
-            unsigned status;
-            unsigned bsr;
-            unsigned wreg;
-            unsigned short long pc;
+            unsigned short long     *Stack;
+            unsigned char           StackSize;
+            unsigned char           StackPtr;
+            unsigned char           status;
+            unsigned char           bsr;
+            unsigned char           wreg;
+            unsigned short long     pc;
+            unsigned char           state;
             void (*function)();
     }thread;
     
-    volatile thread task0;
-    volatile thread task1;
+    typedef unsigned short long StackStruct;
+    typedef unsigned char  StackSize;
+    typedef void (*thread_function)(void);
     
     void (*hisr)() = 0x00;
     void (*lisr)() = 0x00;
     
-    void init_tasks(void);
+    void Scheduler(void);
+    void Task_register(thread*);
     
-    void rtos_delay(unsigned short);
+    void Task_init(thread*, thread_function , StackStruct* , StackSize);
     
-    #define setup_rtos() {INTCONbits.GIE = INTCONbits.PEIE = 1;\
-                         INTCONbits.TMR0IE = INTCON2bits.T0IP=1;\
-                         T0CON=0b00000000;TMR0 = 35530;}
+    void setup_rtos();
 
+    #define reload_timer(){TMR0 = DefaultTimerData;}
+    
+    #define SoftwareInterrupt(){TMR0=35530;}
     #define set_high_interrupt_vector(HISR){isr = HISR;}
     #define set_low_interrupt_vector(LISR) {lsr = LISR;}
 #endif
