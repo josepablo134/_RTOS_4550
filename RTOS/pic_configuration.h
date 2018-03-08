@@ -21,7 +21,8 @@
 #pragma config VREGEN = OFF     // USB Voltage Regulator Enable bit (USB voltage regulator disabled)
 
 // CONFIG2H
-#pragma config WDT = ON         // Watchdog Timer Enable bit (WDT enabled)
+#pragma config WDT = OFF         // Watchdog Timer Enable bit (WDT disabled)
+//#pragma config WDT = ON         // Watchdog Timer Enable bit (WDT enabled)
 #pragma config WDTPS = 512    // Watchdog Timer Postscale Select bits (1:512)
 //CASI CADA 2 SEGUNDOS LADRA
 
